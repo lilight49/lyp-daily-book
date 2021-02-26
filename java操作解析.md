@@ -163,3 +163,23 @@ for (Integer a: lista) {
 }
 ```
 
+
+
+## ASCII字典顺序
+
+```java
+List<String> list = new ArrayList<String>();
+        list.add("b");
+        list.add("d");
+        list.add("a");
+        list.add("c");
+        list.add("A");
+        list.add("0");
+
+        Collections.sort(list);//ASCII字典顺序排列  0-9A-Za-z
+
+        for (String s : list) {
+            System.out.println(s);
+        }
+```
+
