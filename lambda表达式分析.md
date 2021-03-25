@@ -4,6 +4,23 @@
 
 
 
+## lamada使用与sql中的关系
+
+| sql            | lamada             |
+| -------------- | ------------------ |
+| TABLE          | Stream<Tuple<...>> |
+| SELECT         | map()              |
+| DISTINCT       | distinct()         |
+| JOIN           | fiatMap()          |
+| WHERE / HAVING | filter()           |
+| GROUP BY       | collect()          |
+| ORDER BY       | sorted()           |
+| UNION ALL      | concat()           |
+
+
+
+
+
 ##  interface = (int a, int b) ->{ return a+ b}
 
 ```java

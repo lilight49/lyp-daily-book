@@ -2,6 +2,37 @@
 
 
 
+## sql使用总结
+
+前言:一切都是表
+
+### WITH :在Oracle中叫子查询分解
+
+```sql
+-- 示例
+WITH t1(v1, v2) AS (SELECT 1, 2),
+     t2(w1, w2) AS (SELECT v1 * 2, v2 * 2 FROM t1)
+SELECT * from t1, t2;
+
+
+-- 递归  limit num  num用来控制递归的次数
+WITH RECURSIVE t(v) AS (
+    SELECT 1 --种子行
+    UNION ALL
+    SELECT v + 1 --递归
+    FROM t
+)
+SELECT v FROM t LIMIT 10;
+```
+
+
+
+
+
+
+
+
+
 ## sql解析
 
 ### 时间戳格式化函数
@@ -76,6 +107,10 @@ ceiling() --向上取整
 -- partition by 后跟分组字段
 -- order by 排序字段
 ```
+
+
+
+
 
 
 

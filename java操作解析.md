@@ -65,6 +65,17 @@ System.identityHashCode(Object)
 
 
 
+# 注解
+
+## springBoot 实体类的值为null或者数组为空时,字段不返回的解决方案
+
+```java
+import com.fasterxml.jackson.annotation.JsonInclude;
+
+@JsonInclude(JsonInclude.Include.NON_NULL)
+
+```
+
 
 
 

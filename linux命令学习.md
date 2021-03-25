@@ -178,6 +178,8 @@ tail 和 head 加上 -n参数后 都代表输出到指定行数，tail 是指定
  sed -n '1,5p' nohup.out
  # 根据关键字查询日志 每页显示 10条  可以多次grep
  cat -n app.log|grep "error" |more -10
+ # 倒着读取日志文件
+ tac nohup.out |grep 'sanyi' -n |more -10
 ```
 
 
