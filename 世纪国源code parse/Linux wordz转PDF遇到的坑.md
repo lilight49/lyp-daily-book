@@ -2,7 +2,8 @@
 
 # word 生成
 
-[参考资料]:https://www.cnblogs.com/fqfanqi/p/6172223.html
+[参考资料]:https://www.cnblogs.com/fqfanqi/p/6172223.html	"api参考文档"
+[参考资料]:https://www.secn.net/article/1027325.html	"表格合并"
 
 
 
