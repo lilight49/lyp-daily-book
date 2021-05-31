@@ -68,17 +68,13 @@ response:
 
 
 ```java
-package com.gykj.service.sanyi;
+package com.gykj.util;
 
-import com.gykj.controller.sanyi.SanYiReqData;
-import com.gykj.domain.work.WorkProcess;
-import com.gykj.repo.impl.work.WorkProcessRepoImpl;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.NameValuePair;
 import org.apache.commons.httpclient.methods.PostMethod;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -87,83 +83,80 @@ import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.zip.GZIPInputStream;
 
 /**
  * @Descripriton: TODO
  * @author: liyunpeng
- * @date: 2021:05:27 9:36
+ * @date: 2021:05:28 14:04
  **/
-@Service
-public class SanYiService {
-
-    @Autowired
-    private WorkProcessRepoImpl workProcessRepo;
+public class SanyiHttpUtil {
 
     /**
-     * @methodName getArea
-     * @description 获取三一的面积
-     * @param workProcessId:
+     * @methodName SanyiPostSend
+     * @description 三一请求发起
+     * @param url:http路径地址
+     * @param requestParamClass:参数封装类
      * @author liyunpeng
-     * @date 2021/5/27 9:39
-     * @return: double
-    **/
-    public Object getArea(String workProcessId) {
-        WorkProcess workProcess = workProcessRepo.getWorkProcessById(workProcessId);
-
-        SanYiReqData sanYiReqData = new SanYiReqData().init().createData(workProcess);//请求参数初始化
-
-        String url = "http://ucoc.cn:8089/api/general/provider/getHisRecord.jspx";
+     * @date 2021/5/28 13:55
+     * @return: java.lang.String
+     **/
+    public static <T> String PostSend(String url, T requestParamClass) {
         PostMethod postMethod = new PostMethod(url);
         postMethod.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
         postMethod.setRequestHeader("Accept-Encoding", "gzip, deflate, br");
 
-        NameValuePair[] data = this.getRequestParams(sanYiReqData);
+        NameValuePair[] data = getRequestParams(requestParamClass);
         postMethod.setRequestBody(data);
 
         HttpClient httpClient = new HttpClient();
         try {
-            int response = httpClient.executeMethod(postMethod);
-
-            //接收响应的二进制流
-            InputStream input = postMethod.getResponseBodyAsStream();
-            ByteArrayOutputStream output = new ByteArrayOutputStream();
-            byte[] resBytess = new byte[4096];
-            int n = 0;
-            while (-1 != (n = input.read(resBytess))) {
-                output.write(resBytess, 0, n);
-            }
-
-            //解压gzip流
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            try (GZIPInputStream gis = new GZIPInputStream(new ByteArrayInputStream(resBytess))) {
-                int b;
-                while ((b = gis.read()) != -1) {
-                    baos.write((byte) b);
-                }
-            }
-
-            String result = new String(baos.toByteArray(), StandardCharsets.UTF_8);
+            httpClient.executeMethod(postMethod);
+            String result = getResponseParams(postMethod.getResponseBodyAsStream());
 
             return result;
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        return new HashMap<>();
+        return null;
+    }
+
+    /**
+     * @methodName getResponseParams
+     * @description TODO    Content-Encoding: gzip Content-Type: application/octet-stream  二进制Gzip数据流解析
+     * @param inputStreamClass:数据响应信息流
+     * @author liyunpeng
+     * @date 2021/5/28 13:52
+     * @return: java.lang.String
+     **/
+    public static <T> String getResponseParams(T inputStreamClass) {
+        try {
+            InputStream input = (InputStream) inputStreamClass;
+            //接收的二进制流
+            byte[] resBytess = IOUtils.toByteArray(input);
+
+            //解压gzip流
+            GZIPInputStream gzipInputStream = new GZIPInputStream(new ByteArrayInputStream(resBytess));
+
+            return new String(IOUtils.toByteArray(gzipInputStream), StandardCharsets.UTF_8);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return null;
     }
 
     /**
      * @methodName getRequestParams
-     * @description 请求数据封装
-     * @param t:
+     * @description body form表单参数封装
+     * @param requestParamClass:参数封装泛型类
      * @author liyunpeng
      * @date 2021/5/28 11:12
      * @return: org.apache.commons.httpclient.NameValuePair[]
-    **/
-    private <T> NameValuePair[] getRequestParams(T requestParamClass) {
+     **/
+    public static <T> NameValuePair[] getRequestParams(T requestParamClass) {
         List<NameValuePair> list = new ArrayList<>();
 
         Field[] requestParamClassFailds = requestParamClass.getClass().getDeclaredFields();
